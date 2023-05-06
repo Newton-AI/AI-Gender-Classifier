@@ -34,7 +34,7 @@ def crop_face(img, boxes, margin=0.2):
 folder_path = os.path.dirname(__file__)
 detector = FaceDetector()
 classifier = build_classifier()
-path = os.path.join(folder_path, 'base_model.pth')
+path = os.path.join(folder_path, 'resnet-18.pth')
 classifier.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
 classifier.eval()
 
