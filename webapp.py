@@ -20,12 +20,14 @@ def build_classifier():
   classifier.fc = nn.Linear(classifier.fc.in_features, len(classes))
   return classifier
 
-def crop_face(img, boxes):
+def crop_face(img, boxes, margin=0.2):
     faces = []
     for box in boxes:
         x1, y1, w, h = box['bbox']
         x2, y2 = x1 + w, y1 + h
-        face = img[y1:y2, x1:x2]
+        x1_mg, x2_mg = int(x1 * margin), int(x2 * margin)
+        y1_mg, y2_mg = int(y1 * margin), int(y2 * margin)
+        face = img[y1-y1_mg:y2+y2_mg, x1-x1_mg:x2+x2_mg]
         faces.append(face)
     return faces
 
