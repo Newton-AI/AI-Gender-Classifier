@@ -8,4 +8,4 @@ Google Colab Training Notebook:
 https://colab.research.google.com/drive/1fwAEkmwISSGjllmj7h4JGeI2EOcFKrWD?usp=sharing
 
 Deployed using Streamlit: 
-
+https://newton-ai-gender-classifier.streamlit.app/
