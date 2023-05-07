@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 from torchvision import transforms
 from torchvision.models import resnet18
+import torch.nn.functional as F
 
 warnings.filterwarnings('ignore')
 
@@ -20,13 +21,13 @@ def build_classifier():
   classifier.fc = nn.Linear(classifier.fc.in_features, len(classes))
   return classifier
 
-def crop_face(img, boxes, margin=0.2):
+def crop_face(img, boxes, x_margin=0.1, y_margin=0.5):
     faces = []
     for box in boxes:
         x1, y1, w, h = box['bbox']
         x2, y2 = x1 + w, y1 + h
-        x1_mg, x2_mg = int(x1 * margin), int(x2 * margin)
-        y1_mg, y2_mg = int(y1 * margin), int(y2 * margin)
+        x1_mg, x2_mg = int(x1 * x_margin), int(x2 * x_margin)
+        y1_mg, y2_mg = int(y1 * y_margin), int(y2 * y_margin)
         face = img[y1-y1_mg:y2+y2_mg, x1-x1_mg:x2+x2_mg]
         faces.append(face)
     return faces
@@ -62,16 +63,20 @@ if img_buffer:
 
             with torch.no_grad():
                 output = classifier(transformed_img)
-                _, predictions = torch.max(output, 1)
-                label = classes[predictions.item()]
+                probs = F.softmax(output, dim=1)
+                _, preds = torch.max(probs, 1)
+                idx = preds.item()
+                conf = probs[0][idx].item()
+                label = classes[idx]
             
+            title = label + ', Conf: ' + str(round(conf*100)) + '%'
             if len(faces) == 1:
                 ax.imshow(PIL_img)
-                ax.set_title(label)
+                ax.set_title(title)
                 ax.axis("off")
             else:
                 ax[i].imshow(PIL_img)
-                ax[i].set_title(label)
+                ax[i].set_title(title)
                 ax[i].axis("off")
         
         st.pyplot(fig)
